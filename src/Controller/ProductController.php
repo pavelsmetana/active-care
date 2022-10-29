@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Model\Product;
+
 class ProductController extends Controller
 {
     public function list()
     {
-        echo $this->render("product/list", ["products" => [
-            "pr1", "pr2"
-        ]]);
+        $product = new Product();
+
+        echo $this->render("product/list", ["products" => $product->productList()]);
     }
 }
