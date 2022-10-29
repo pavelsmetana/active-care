@@ -1,0 +1,6 @@
+.env
+docker-compose.yaml
+mysql-db
+nginx/conf.d/*.conf
+nginx/conf/*.conf
+logs

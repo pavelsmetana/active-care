@@ -1,0 +1,39 @@
+server {
+  listen ${DOCKER_NGINX_PORT};
+  resolver ${DNS_RESOLVER} valid=10s;
+  server_name _;
+  root /www/public;
+
+  location = /favicon.ico {
+    return 204;
+    access_log off;
+    log_not_found off;
+  }
+
+  location / {
+    try_files $uri /index.php$is_args$args;
+
+    if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, PUT';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Gate';
+        add_header 'Access-Control-Max-Age' 1728000;
+        add_header 'Content-Type' 'text/plain; charset=utf-8';
+        add_header 'Content-Length' 0;
+
+        return 204;
+    }
+  }
+
+  location ~ ^/index\.php(/|$) {
+    fastcgi_pass            php-fpm:9000;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include                 fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param HTTPS off;
+
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Headers' 'Gate, Content-Type, api_key, Authorization';
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, PUT';
+  }
+}
