@@ -20,6 +20,9 @@ down: ## Down containers in current project
 bash: ## docker apache bash
 	docker exec -it blank-php-fpm bash
 
+# Composer install
+install: ## Composer install
+	docker exec -it blank-php-fpm composer install
 
 init: ## Initialize all local configs if not initialized
 	@if [[ ! -f "./docker/.env" ]]; then \

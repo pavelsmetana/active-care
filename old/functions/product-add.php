@@ -13,7 +13,7 @@ $description = $_POST['description'];
     }
 
 
-    mysqli_query($connect, "INSERT INTO `products` (`id`, `name`,  `img`, `description`) 
+$pdo->query("INSERT INTO `products` (`id`, `name`,  `img`, `description`) 
 VALUES (NULL, '$name', '$img', '$description')");
 
     $_SESSION['message'] = 'Продукт добавлен успешно!';
