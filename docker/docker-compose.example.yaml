@@ -1,0 +1,65 @@
+version: '3'
+services:
+  blank-nginx:
+    restart: always
+    container_name: blank-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+#      args:
+#        DOCKER_USER_UID: $DOCKER_USER_UID
+#        DOCKER_GROUP_UID: $DOCKER_GROUP_UID
+#    user: $DOCKER_USER
+    working_dir: /www
+    environment:
+      NGINX_ENVSUBST_TEMPLATE_SUFFIX: ".conf"
+      NGINX_ENVSUBST_TEMPLATE_DIR: "/var/nginx/templates"
+      DOCKER_NGINX_PORT: $DOCKER_NGINX_PORT
+      DNS_RESOLVER: $DNS_RESOLVER
+
+    ports:
+      - '${NGINX_PORT}:${DOCKER_NGINX_PORT}'
+    volumes:
+      - ./nginx/conf.d:/var/nginx/templates
+      - ./nginx/conf:/etc/nginx/conf
+      - ..:/www
+    networks:
+      - blank-network
+
+  blank-db:
+    container_name: blank-db
+    platform: linux/x86_64
+    restart: always
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=blank5
+      - MYSQL_ROOT_PASSWORD=Ayse1994@
+    ports:
+      - '3388:3306'
+    volumes:
+      - "./mysql-db:/var/lib/mysql"
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/custom.cnf:/etc/my.cnf.d/custom.cnf
+    networks:
+      blank-network:
+        aliases:
+          - db
+
+  blank-php-fpm:
+    container_name: blank-php-fpm
+    restart: always
+    build:
+      context: ./php-fpm
+      dockerfile: Dockerfile
+    working_dir: /www
+    user: $DOCKER_USER
+    volumes:
+      - ..:/www
+    networks:
+      blank-network:
+        aliases:
+          - php-fpm
+
+networks:
+  blank-network:
+
